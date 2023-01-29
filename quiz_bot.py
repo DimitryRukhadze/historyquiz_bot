@@ -29,7 +29,7 @@ def get_questions_from_file():
     questions_answers = json.loads(questions_answers)
     return questions_answers
 
-def get_curr_question_with_answer(user_id, connection):
+def get_correct_answer(user_id, connection):
     curr_question = connection.get(user_id)
     questions_with_answers = get_questions_from_file()
     return questions_with_answers[curr_question]
@@ -70,18 +70,17 @@ def handle_input_attempt(bot, update, connection=''):
     keyboard_markup = make_keyboard_markup(buttons, 2)
     bot.send_message(chat_id=curr_user_id, text='Выбери вариант', reply_markup=keyboard_markup)
 
-    correct_answer = get_curr_question_with_answer(curr_user_id, connection)
+    correct_answer = get_correct_answer(curr_user_id, connection)
 
     if update.message.text not in correct_answer.rstrip('.'):
         bot.send_message(chat_id=curr_user_id, text='Это не верно! Попробуйте ещё.')
-        bot.send_message(chat_id=curr_user_id, text=correct_answer)
         return States.ATTEMPT_INPUT
     bot.send_message(chat_id=curr_user_id, text='Это верно!')
     return States.NEW_QUESTION
 
 def give_up(bot, update, connection=''):
     curr_user_id = update.effective_chat.id
-    correct_answer = get_curr_question_with_answer(curr_user_id, connection)
+    correct_answer = get_correct_answer(curr_user_id, connection)
     bot.send_message(chat_id=curr_user_id, text=f'Вот правильный ответ:\n{correct_answer}')
     buttons = ['Новый вопрос', 'Мой Счёт']
     keyboard_markup = make_keyboard_markup(buttons, 2)
