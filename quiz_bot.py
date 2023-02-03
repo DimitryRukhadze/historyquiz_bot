@@ -18,7 +18,7 @@ from telegram.ext import (
     Filters
 )
 
-question_filepath = os.path.abspath('questions.json')
+question_filepath = os.getcwd()
 
 class States(Enum):
     NEW_QUESTION = auto()
