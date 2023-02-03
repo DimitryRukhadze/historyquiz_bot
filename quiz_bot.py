@@ -18,7 +18,6 @@ from telegram.ext import (
     Filters
 )
 
-BASE_DIR = os.getcwd()
 
 class States(Enum):
     NEW_QUESTION = auto()
@@ -26,8 +25,7 @@ class States(Enum):
     NEW_CYCLE = auto()
 
 def get_questions_from_file():
-    question_filepath = os.path.join(BASE_DIR, 'questions.json')
-    print(question_filepath)
+    question_filepath = os.path.abspath('questions.json')
     with open(question_filepath, 'r') as file:
         questions_answers = file.read()
     questions_answers = json.loads(questions_answers)
