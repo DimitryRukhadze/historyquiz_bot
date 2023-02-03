@@ -1,6 +1,7 @@
 import json
 import random
 import functools
+import os
 
 from environs import Env
 from enum import Enum, auto
@@ -17,6 +18,7 @@ from telegram.ext import (
     Filters
 )
 
+BASE_DIR = os.getcwd()
 
 class States(Enum):
     NEW_QUESTION = auto()
@@ -24,7 +26,7 @@ class States(Enum):
     NEW_CYCLE = auto()
 
 def get_questions_from_file():
-    with open('questions.json', 'r') as file:
+    with open(os.path.join(BASE_DIR, 'questions.json'), 'r') as file:
         questions_answers = file.read()
     questions_answers = json.loads(questions_answers)
     return questions_answers
@@ -55,12 +57,16 @@ def new_question_request(bot, update, connection=''):
     curr_user_id = update.effective_chat.id
     buttons = ['Новый вопрос', 'Мой Счёт']
     keyboard_markup = make_keyboard_markup(buttons, 2)
-    bot.send_message(chat_id=curr_user_id, text='Выбери вариант', reply_markup=keyboard_markup)
     questions_with_answers = get_questions_from_file()
     questions = list(questions_with_answers.keys())
     question_for_user = questions[random.randint(0, len(questions))]
     connection.set(curr_user_id, question_for_user)
     bot.send_message(chat_id=curr_user_id, text=question_for_user)
+    bot.send_message(
+        chat_id=curr_user_id,
+        text='Напиши ответ или выбери вариант на клавиатуре',
+        reply_markup=keyboard_markup
+    )
 
     return States.ATTEMPT_INPUT
 
