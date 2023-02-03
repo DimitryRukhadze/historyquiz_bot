@@ -18,6 +18,7 @@ from telegram.ext import (
     Filters
 )
 
+question_filepath = os.path.abspath('questions.json')
 
 class States(Enum):
     NEW_QUESTION = auto()
@@ -25,7 +26,6 @@ class States(Enum):
     NEW_CYCLE = auto()
 
 def get_questions_from_file():
-    question_filepath = os.path.abspath('questions.json')
     with open(question_filepath, 'r') as file:
         questions_answers = file.read()
     questions_answers = json.loads(questions_answers)
@@ -49,7 +49,7 @@ def make_keyboard_markup(buttons, rows):
 def start(bot, update):
     buttons = ['Начнём!']
     keyboard_markup = make_keyboard_markup(buttons, 1)
-    bot.send_message(chat_id=update.effective_chat.id, text='Выбери вариант', reply_markup=keyboard_markup)
+    bot.send_message(chat_id=update.effective_chat.id, text=question_filepath, reply_markup=keyboard_markup)
 
     return States.NEW_QUESTION
 
