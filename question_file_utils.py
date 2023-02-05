@@ -1,5 +1,6 @@
 import os
 import json
+import codecs
 
 from environs import Env
 
@@ -7,7 +8,7 @@ from environs import Env
 def parse_questions_file(question_dir):
     question_filenames = os.listdir(question_dir)
     all_questions = []
-    for filename in question_filenames:
+    for filename in question_filenames[0:2]:
         with open(
                 os.path.join(question_dir, filename),
                 'r',
@@ -26,7 +27,7 @@ def parse_questions_file(question_dir):
 
 def make_questions_json(questions):
 
-    with open('questions.json', 'w') as file:
+    with codecs.open('questions.json', 'w', 'utf-8') as file:
         questions_json = json.dumps(questions, ensure_ascii=False)
         file.write(questions_json)
 

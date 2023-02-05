@@ -26,7 +26,7 @@ class States(Enum):
     NEW_CYCLE = auto()
 
 def get_questions_from_file():
-    with open(question_filepath, 'r') as file:
+    with open(question_filepath, 'r', encoding='utf-8') as file:
         questions_answers = file.read()
     questions_answers = json.loads(questions_answers)
     return questions_answers
