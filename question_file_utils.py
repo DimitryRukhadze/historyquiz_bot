@@ -25,9 +25,9 @@ def parse_questions_file(question_dir):
     }
     return questions_with_answers
 
-def make_questions_json(questions):
+def make_questions_json(questions, target_file):
 
-    with codecs.open('questions.json', 'w', 'utf-8') as file:
+    with codecs.open(target_file, 'w', 'utf-8') as file:
         questions_json = json.dumps(questions, ensure_ascii=False)
         file.write(questions_json)
 
@@ -37,5 +37,6 @@ if __name__ == '__main__':
     env.read_env()
 
     questions_dir = env('QUESTIONS_DIR')
+    questions_filename = env('QUESTION_FILE')
     questions_raw = parse_questions_file(questions_dir)
     make_questions_json(questions_raw)
