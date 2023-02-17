@@ -8,7 +8,7 @@ from environs import Env
 def parse_questions_file(question_dir):
     question_filenames = os.listdir(question_dir)
     all_questions = []
-    for filename in question_filenames[0:2]:
+    for filename in question_filenames:
         with open(
                 os.path.join(question_dir, filename),
                 'r',
