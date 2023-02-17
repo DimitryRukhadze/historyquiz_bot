@@ -1,7 +1,6 @@
 import random
 
 from environs import Env
-from contextlib import suppress
 
 import vk_api
 import redis
