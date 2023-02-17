@@ -3,3 +3,4 @@ env
 .gitattributes
 *questions
 *.pyc
+*.json
