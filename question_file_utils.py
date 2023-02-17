@@ -5,6 +5,8 @@ import codecs
 from environs import Env
 
 
+question_filepath = os.path.join(os.getcwd(),'questions.json')
+
 def parse_questions_file(question_dir):
     question_filenames = os.listdir(question_dir)
     all_questions = []
@@ -31,6 +33,17 @@ def make_questions_json(questions, target_file):
         questions_json = json.dumps(questions, ensure_ascii=False)
         file.write(questions_json)
 
+def get_questions_from_file(question_filepath):
+    with open(question_filepath, 'r', encoding='utf-8') as file:
+        questions_answers = file.read()
+    questions_answers = json.loads(questions_answers)
+    return questions_answers
+
+def get_correct_answer(user_id, connection):
+    curr_question = connection.get(user_id)
+    questions_with_answers = get_questions_from_file(question_filepath)
+    return questions_with_answers[curr_question]
+
 
 if __name__ == '__main__':
     env = Env()
@@ -39,4 +52,4 @@ if __name__ == '__main__':
     questions_dir = env('QUESTIONS_DIR')
     questions_filename = env('QUESTION_FILE')
     questions_raw = parse_questions_file(questions_dir)
-    make_questions_json(questions_raw)
+    make_questions_json(questions_raw, questions_filename)

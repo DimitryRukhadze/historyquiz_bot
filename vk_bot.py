@@ -1,4 +1,5 @@
 import random
+import os
 
 from environs import Env
 
@@ -8,7 +9,7 @@ import redis
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.keyboard import VkKeyboard
 
-from quiz_bot import get_questions_from_file, get_correct_answer
+from question_file_utils import get_questions_from_file, get_correct_answer, question_filepath
 
 
 def send_message(event, vk_api, text):
@@ -46,7 +47,7 @@ def main():
     vk_session = vk_api.VkApi(token=vk_token)
     vk_curr_api = vk_session.get_api()
     longpoll = VkLongPoll(vk_session)
-    questions_with_answers = get_questions_from_file()
+    questions_with_answers = get_questions_from_file(question_filepath)
 
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:

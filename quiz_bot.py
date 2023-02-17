@@ -1,4 +1,3 @@
-import json
 import random
 import functools
 import os
@@ -18,23 +17,14 @@ from telegram.ext import (
     Filters
 )
 
-question_filepath = os.path.join(os.getcwd(),'questions.json')
+from question_file_utils import get_questions_from_file, get_correct_answer, question_filepath
+
 
 class States(Enum):
     NEW_QUESTION = auto()
     ATTEMPT_INPUT = auto()
     NEW_CYCLE = auto()
 
-def get_questions_from_file():
-    with open(question_filepath, 'r', encoding='utf-8') as file:
-        questions_answers = file.read()
-    questions_answers = json.loads(questions_answers)
-    return questions_answers
-
-def get_correct_answer(user_id, connection):
-    curr_question = connection.get(user_id)
-    questions_with_answers = get_questions_from_file()
-    return questions_with_answers[curr_question]
 
 def make_keyboard_markup(buttons, rows):
     reply_keyboard = [
@@ -57,7 +47,7 @@ def new_question_request(bot, update, connection=''):
     curr_user_id = update.effective_chat.id
     buttons = ['Новый вопрос', 'Мой Счёт']
     keyboard_markup = make_keyboard_markup(buttons, 2)
-    questions_with_answers = get_questions_from_file()
+    questions_with_answers = get_questions_from_file(question_filepath)
     questions = list(questions_with_answers.keys())
     question_for_user = questions[random.randint(0, len(questions))]
     connection.set(curr_user_id, question_for_user)
