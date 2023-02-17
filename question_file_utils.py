@@ -7,7 +7,7 @@ from environs import Env
 
 question_filepath = os.path.join(os.getcwd(),'questions.json')
 
-def parse_questions_file(question_dir):
+def parse_questions_file(question_dir, question_filename):
     question_filenames = os.listdir(question_dir)
     all_questions = []
     for filename in question_filenames:
@@ -25,12 +25,8 @@ def parse_questions_file(question_dir):
         for i in range(0, len(all_questions))
         if 'Вопрос' in all_questions[i]
     }
-    return questions_with_answers
-
-def make_questions_json(questions, target_file):
-
-    with codecs.open(target_file, 'w', 'utf-8') as file:
-        questions_json = json.dumps(questions, ensure_ascii=False)
+    with codecs.open(question_filename, 'w', 'utf-8') as file:
+        questions_json = json.dumps(questions_with_answers, ensure_ascii=False)
         file.write(questions_json)
 
 def get_questions_from_file(question_filepath):
@@ -51,5 +47,4 @@ if __name__ == '__main__':
 
     questions_dir = env('QUESTIONS_DIR')
     questions_filename = env('QUESTION_FILE')
-    questions_raw = parse_questions_file(questions_dir)
-    make_questions_json(questions_raw, questions_filename)
+    questions_raw = parse_questions_file(questions_dir, questions_filename)
