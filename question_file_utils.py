@@ -35,11 +35,6 @@ def get_questions_from_file(question_filepath):
     questions_answers = json.loads(questions_answers)
     return questions_answers
 
-def get_correct_answer(user_id, connection):
-    curr_question = connection.get(user_id)
-    questions_with_answers = get_questions_from_file(question_filepath)
-    return questions_with_answers[curr_question]
-
 
 if __name__ == '__main__':
     env = Env()

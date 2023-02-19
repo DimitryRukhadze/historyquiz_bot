@@ -1,6 +1,5 @@
 import random
 import functools
-import os
 
 from environs import Env
 from enum import Enum, auto
@@ -17,7 +16,7 @@ from telegram.ext import (
     Filters
 )
 
-from question_file_utils import get_questions_from_file, get_correct_answer, question_filepath
+from question_file_utils import get_questions_from_file, question_filepath
 
 
 class States(Enum):
@@ -43,12 +42,11 @@ def start(bot, update):
 
     return States.NEW_QUESTION
 
-def new_question_request(bot, update, connection=''):
+def new_question_request(bot, update, connection='', questions_from_file=''):
     curr_user_id = update.effective_chat.id
     buttons = ['Новый вопрос', 'Мой Счёт']
     keyboard_markup = make_keyboard_markup(buttons, 2)
-    questions_with_answers = get_questions_from_file(question_filepath)
-    questions = list(questions_with_answers.keys())
+    questions = list(questions_from_file.keys())
     question_for_user = questions[random.randint(0, len(questions))]
     connection.set(curr_user_id, question_for_user)
     bot.send_message(chat_id=curr_user_id, text=question_for_user)
@@ -60,13 +58,13 @@ def new_question_request(bot, update, connection=''):
 
     return States.ATTEMPT_INPUT
 
-def handle_input_attempt(bot, update, connection=''):
+def handle_input_attempt(bot, update, connection='', questions_from_file=''):
     curr_user_id = update.effective_chat.id
     buttons = ['Новый вопрос', 'Сдаться', 'Мой Счёт']
     keyboard_markup = make_keyboard_markup(buttons, 2)
     bot.send_message(chat_id=curr_user_id, text='Выбери вариант', reply_markup=keyboard_markup)
-
-    correct_answer = get_correct_answer(curr_user_id, connection)
+    curr_question = connection.get(curr_user_id)
+    correct_answer = questions_from_file[curr_question]
 
     if update.message.text not in correct_answer.rstrip('.'):
         bot.send_message(chat_id=curr_user_id, text='Это не верно! Попробуйте ещё.')
@@ -74,9 +72,10 @@ def handle_input_attempt(bot, update, connection=''):
     bot.send_message(chat_id=curr_user_id, text='Это верно!')
     return States.NEW_QUESTION
 
-def give_up(bot, update, connection=''):
+def give_up(bot, update, connection='', questions_from_file=''):
     curr_user_id = update.effective_chat.id
-    correct_answer = get_correct_answer(curr_user_id, connection)
+    curr_question = connection.get(curr_user_id)
+    correct_answer = questions_from_file[curr_question]
     bot.send_message(chat_id=curr_user_id, text=f'Вот правильный ответ:\n{correct_answer}')
     buttons = ['Новый вопрос', 'Мой Счёт']
     keyboard_markup = make_keyboard_markup(buttons, 2)
@@ -97,17 +96,22 @@ def main():
         decode_responses=True
     )
 
+    questions_from_file = get_questions_from_file(question_filepath)
+
     new_question_request_with_connection = functools.partial(
         new_question_request,
-        connection=db_connection
+        connection=db_connection,
+        questions_from_file=questions_from_file
     )
     handle_input_attempt_with_connection = functools.partial(
         handle_input_attempt,
-        connection=db_connection
+        connection=db_connection,
+        questions_from_file=questions_from_file
     )
     give_up_with_connection = functools.partial(
         give_up,
-        connection=db_connection
+        connection=db_connection,
+        questions_from_file=questions_from_file
     )
 
     updater = Updater(env('TELEGA_TOKEN'))

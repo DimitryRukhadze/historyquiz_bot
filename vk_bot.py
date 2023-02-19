@@ -9,7 +9,7 @@ import redis
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.keyboard import VkKeyboard
 
-from question_file_utils import get_questions_from_file, get_correct_answer, question_filepath
+from question_file_utils import get_questions_from_file, question_filepath
 
 
 def send_message(event, vk_api, text):
@@ -60,7 +60,8 @@ def main():
                 send_message(event, vk_curr_api, question_for_user)
             else:
                 try:
-                    correct_answer = get_correct_answer(event.user_id, db_connection)
+                    curr_question = db_connection.get(event.user_id)
+                    correct_answer = questions_with_answers[curr_question]
                 except KeyError:
                     send_message(event, vk_curr_api, 'Нажмите кнопку "Новый вопрос"')
                 if event.text == 'Сдаться':
