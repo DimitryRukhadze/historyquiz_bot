@@ -25,19 +25,10 @@ class States(Enum):
     NEW_CYCLE = auto()
 
 
-def make_keyboard_markup(buttons, rows):
-    reply_keyboard = [
-        buttons[index:index+rows]
-        for index in range(0, len(buttons), rows)
-    ]
-
-    keyboard_markup = ReplyKeyboardMarkup(reply_keyboard)
-    return keyboard_markup
-
-
 def start(bot, update):
     buttons = ['Начнём!']
-    keyboard_markup = make_keyboard_markup(buttons, 1)
+    reply_keyboard = [buttons]
+    keyboard_markup = ReplyKeyboardMarkup(reply_keyboard)
     bot.send_message(chat_id=update.effective_chat.id, text=question_filepath, reply_markup=keyboard_markup)
 
     return States.NEW_QUESTION
@@ -45,7 +36,8 @@ def start(bot, update):
 def new_question_request(bot, update, connection='', questions_from_file=''):
     curr_user_id = update.effective_chat.id
     buttons = ['Новый вопрос', 'Мой Счёт']
-    keyboard_markup = make_keyboard_markup(buttons, 2)
+    reply_keyboard = [buttons]
+    keyboard_markup = ReplyKeyboardMarkup(reply_keyboard)
     questions = list(questions_from_file.keys())
     question_for_user = questions[random.randint(0, len(questions))]
     connection.set(curr_user_id, question_for_user)
@@ -61,7 +53,8 @@ def new_question_request(bot, update, connection='', questions_from_file=''):
 def handle_input_attempt(bot, update, connection='', questions_from_file=''):
     curr_user_id = update.effective_chat.id
     buttons = ['Новый вопрос', 'Сдаться', 'Мой Счёт']
-    keyboard_markup = make_keyboard_markup(buttons, 2)
+    reply_keyboard = [buttons[0:2], buttons[-1:]]
+    keyboard_markup = ReplyKeyboardMarkup(reply_keyboard)
     bot.send_message(chat_id=curr_user_id, text='Выбери вариант', reply_markup=keyboard_markup)
     curr_question = connection.get(curr_user_id)
     correct_answer = questions_from_file[curr_question]
@@ -78,7 +71,8 @@ def give_up(bot, update, connection='', questions_from_file=''):
     correct_answer = questions_from_file[curr_question]
     bot.send_message(chat_id=curr_user_id, text=f'Вот правильный ответ:\n{correct_answer}')
     buttons = ['Новый вопрос', 'Мой Счёт']
-    keyboard_markup = make_keyboard_markup(buttons, 2)
+    reply_keyboard = [buttons]
+    keyboard_markup = ReplyKeyboardMarkup(reply_keyboard)
     bot.send_message(chat_id=curr_user_id, text='Выбери вариант', reply_markup=keyboard_markup)
 
 def main():
