@@ -59,20 +59,17 @@ def main():
                 db_connection.set(event.user_id, question_for_user)
                 send_message(event, vk_curr_api, question_for_user)
             else:
-                try:
-                    curr_question = db_connection.get(event.user_id)
-                    correct_answer = questions_with_answers[curr_question]
-                except KeyError:
+                curr_question = db_connection.get(event.user_id)
+                if not curr_question:
                     send_message(event, vk_curr_api, 'Нажмите кнопку "Новый вопрос"')
-                if event.text == 'Сдаться':
-                    try:
-                        send_message(event, vk_curr_api, correct_answer)
-                    except UnboundLocalError:
-                        send_message(event, vk_curr_api, 'Вам пока не загадывали вопросов')
-                elif event.text in correct_answer.rstrip('.'):
-                    send_message(event, vk_curr_api, 'Верно!')
                 else:
-                    send_message(event, vk_curr_api, 'Неверно! Попробуйте ещё')
+                    correct_answer = questions_with_answers[curr_question]
+                    if event.text == 'Сдаться':
+                        send_message(event, vk_curr_api, correct_answer)
+                    elif event.text in correct_answer.rstrip('.'):
+                        send_message(event, vk_curr_api, 'Верно!')
+                    else:
+                        send_message(event, vk_curr_api, 'Неверно! Попробуйте ещё')
 
 
 if __name__ == '__main__':
